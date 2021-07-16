@@ -1,6 +1,7 @@
 class Api::V1::BaseController < ApplicationController
   before_action :authenticate_api_key!
   before_action :authenticate_user_from_token!
+  before_action :get_t
   skip_before_action :authenticate_user!
   skip_before_action :verify_authenticity_token
   ParamsSchemaInvalid = Class.new(StandardError)
@@ -28,6 +29,7 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def render_success(data)
+    data.merge!(@t) if @t.is_a?(Hash)
     render json: { data: data }, status: 200
   end
 
@@ -55,4 +57,8 @@ class Api::V1::BaseController < ApplicationController
     TokenService.encode('user' => user.id)
   end
 
+  def get_t
+    translation_path = "#{controller_path}/#{action_name}".gsub('/', '.')
+    @t = {t: t(translation_path)}
+  end
 end
