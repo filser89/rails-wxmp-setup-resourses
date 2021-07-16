@@ -42,6 +42,8 @@ class Api::V1::UsersController < Api::V1::BaseController
     puts "user: #{user}"
     puts "standard_hash: #{user}"
     puts "Response: #{response}"
-    render_success({ user: user, auth_token: token })
+    user = ActiveModelSerializers::SerializableResource.new(user).as_json
+    res = {user: user, auth_token: token}
+    render_success(res)
   end
 end
